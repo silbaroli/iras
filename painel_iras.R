@@ -52,16 +52,19 @@ page <- dashboardBody(
 ui <- dashboardPage(header,sidebar,page,skin='black')
 
 server <- function(input, output) {
-  db=data.frame()
-  for(i in c(2012:2020)){
-    temp <- readxl::read_excel(paste0("data/iras_",i,".xlsx"))
-    db=dplyr::bind_rows(temp,db)
-  }
+  db=read.csv("database.csv")
+  db$DATA=as.Date(db$DATA)
   
-  db$TIPO.INFEC=ifelse(db$TIPO.INFEC=="IPCSC","IPCSL",db$TIPO.INFEC)
+  # db=data.frame()
+  # for(i in c(2012:2020)){
+  #   temp <- readxl::read_excel(paste0("data/iras_",i,".xlsx"))
+  #   db=dplyr::bind_rows(temp,db)
+  # }
+  # 
+  # db$TIPO.INFEC=ifelse(db$TIPO.INFEC=="IPCSC","IPCSL",db$TIPO.INFEC)
   
   # for(i in c(2012:2020)){
-  #   github_link <- paste0("https://github.com/barbosasil/IRAS/raw/main/iras_",i,".xlsx")
+  #   github_link <- paste0("https://github.com/silbaroli/iras/blob/main/data/iras_2012.xlsx")
   #   temp_file <- tempfile(fileext = ".xlsx")
   #   req <- GET(github_link,
   #              authenticate(Sys.getenv("GITHUB_PAT"), ""),
@@ -71,8 +74,6 @@ server <- function(input, output) {
   # }
   
   
-  db=data.frame(db)
-  db$DATA=as.Date(db$DATA)
   
   output$title1 <-renderText({
     paste0("Número de hospitais com ", input$select1 ," na notificação nacional de IRAS ",input$select2," de ",year(min(input$date))," a ",year(max(input$date)))
@@ -103,7 +104,7 @@ server <- function(input, output) {
     plot_ly(data = tab1,x = ~ano,y = ~col1,type = "bar",name='Pelo menos 1 vez') %>%
       add_trace(y = ~col2, name = 'Pelo menos 10 vezes no ano') %>%
       layout(yaxis = list(title = 'Número'), barmode = 'group') %>%
-      layout(legend = list(orientation = 'h')) %>%
+      layout(legend = list(orientation = 'h',xanchor = "center",x = 0.5,y=-0.3)) %>%
       layout(yaxis = list(tickformat = ".0f"))
     
   })
@@ -198,7 +199,7 @@ server <- function(input, output) {
       add_trace(y = ~col3, name = 'Cateter central por dia') %>%
       add_trace(y = ~col5, name = 'Paciente por dia') %>%
       layout(yaxis = list(title = 'Número'), barmode = 'group') %>%
-      layout(legend = list(orientation = 'h')) %>%
+      layout(legend = list(orientation = 'h',xanchor = "center",x = 0.5,y=-0.2)) %>%
       layout(yaxis = list(tickformat = ".0f"))
     
   })
